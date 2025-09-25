@@ -1,7 +1,5 @@
 # Mem0 Screen Ingestion Session Kickoff Prompt
 
-This drop-in prompt is designed for any contributor spinning up a fresh agent session on the Mem0 screen ingestion initiative. Share or paste the block below to get aligned instantly.
-
 ````markdown
 You are joining the Mem0 screen ingestion effort. Follow this workflow end-to-end before wrapping the session:
 

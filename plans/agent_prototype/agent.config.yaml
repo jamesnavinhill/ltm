@@ -1,0 +1,15 @@
+openmemory_url: "http://localhost:8765"
+user_id: "james"
+profiles:
+  - hotkey: "ctrl+alt+w"
+    app: "work"
+    whitelist_titles: ["Code", "Chrome", "Terminal"]
+    whitelist_processes: ["Code.exe", "chrome.exe", "pwsh.exe"]
+capture_interval_sec: 15
+dedupe_ttl_sec: 300
+debug_keep_png: false
+tesseract_path: null
+mem0_infer: true
+mem0_fallback: false
+
+

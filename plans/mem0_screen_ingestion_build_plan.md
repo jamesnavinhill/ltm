@@ -16,24 +16,24 @@ This plan accompanies `mem0_screen_ingestion_spec.md` and breaks the effort into
 
 ## Phase 1 – Capture agent scaffolding (Python)
 
-- [ ] Create new package directory `plans/agent_prototype/` (or repo-approved location) with `__init__.py`, `capture.py`, `config.py`.
-- [ ] Implement configuration loader handling YAML/TOML with schema described in spec (store defaults in `config.py`).
-- [ ] Implement screen capture loop in `capture.py` using `mss` and `pywin32` to collect active window metadata (window title/process name).
-- [ ] Save raw PNG to temp dir and delete after OCR succeeds (respect debug flag).
+- [x] Create new package directory `plans/agent_prototype/` (or repo-approved location) with `__init__.py`, `capture.py`, `config.py`.
+- [x] Implement configuration loader handling YAML/TOML with schema described in spec (store defaults in `config.py`).
+- [x] Implement screen capture function in `capture.py` using `mss` and `pywin32` to collect active window metadata (window title/process name).
+- [x] Save raw PNG to temp dir and delete after OCR succeeds (respect debug flag).
 
 ## Phase 2 – OCR + normalization
 
-- [ ] Integrate `pytesseract` OCR call with configurable language packs.
-- [ ] Normalize text (strip blank lines, collapse whitespace, limit repeated lines) per spec §6.2.
-- [ ] Compute MD5 hash of normalized text (`hashlib.md5`) mirroring Mem0 `_create_memory` usage (see `mem0/memory/main.py`).
-- [ ] Maintain dedupe LRU cache with TTL (store in `dedupe.py` or within capture loop) – skip captures when hash seen within interval.
+- [x] Integrate `pytesseract` OCR call with configurable language packs.
+- [x] Normalize text (strip blank lines, collapse whitespace, limit repeated lines) per spec §6.2.
+- [x] Compute MD5 hash of normalized text (`hashlib.md5`) mirroring Mem0 `_create_memory` usage (see `mem0/memory/main.py`).
+- [x] Maintain dedupe LRU cache with TTL (store in `dedupe.py` or within capture loop) – skip captures when hash seen within interval.
 
 ## Phase 3 – Ingestion adapter
 
-- [ ] Implement REST client using `httpx` to call OpenMemory `POST /api/v1/memories/` with payload (`user_id`, `app`, `metadata`, `infer` per spec §7.1).
-- [ ] Handle error responses returning `{ "error": ... }` by enqueueing payload into local SQLite-backed queue (`queue.py`).
-- [ ] Provide CLI command `python capture.py --drain` to replay queued payloads once server reachable.
-- [ ] Optional fallback: direct Mem0 SDK path using `Memory.add` (import from `mem0.memory.main`) when OpenMemory unreachable.
+- [x] Implement REST submit helper using `httpx` with robust error handling.
+- [x] Handle error responses/connection failures by enqueueing payload into local SQLite-backed queue (`queue.py`).
+- [x] Provide CLI `plans/agent_prototype/cli.py drain` to replay queued payloads once server reachable.
+- [ ] Optional fallback: direct Mem0 SDK path using `Memory.add` when OpenMemory unreachable.
 
 ## Phase 4 – Multi-profile routing & controls
 
