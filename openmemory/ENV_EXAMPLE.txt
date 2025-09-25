@@ -1,0 +1,8 @@
+# OpenMemory root .env — used by docker-compose for UI variables
+# Copy this file to .env in the same directory and set your values
+
+# URL to API container
+NEXT_PUBLIC_API_URL=http://localhost:8765
+
+# Default user id shown/used by UI
+USER=james

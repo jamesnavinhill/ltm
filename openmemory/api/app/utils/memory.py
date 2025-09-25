@@ -236,28 +236,51 @@ def get_default_memory_config():
     
     print(f"Auto-detected vector store: {vector_store_provider} with config: {vector_store_config}")
     
-    return {
-        "vector_store": {
-            "provider": vector_store_provider,
-            "config": vector_store_config
-        },
-        "llm": {
+    # Prefer Google Gemini if GOOGLE_API_KEY is present; otherwise fall back to OpenAI
+    use_gemini = bool(os.environ.get('GOOGLE_API_KEY'))
+    if use_gemini:
+        llm_section = {
+            "provider": "gemini",
+            "config": {
+                "model": "gemini-2.0-flash",
+                "temperature": 0.1,
+                "max_tokens": 2000,
+                "api_key": "env:GOOGLE_API_KEY",
+            },
+        }
+        embedder_section = {
+            "provider": "gemini",
+            "config": {
+                "model": "text-embedding-004",
+                "api_key": "env:GOOGLE_API_KEY",
+            },
+        }
+    else:
+        llm_section = {
             "provider": "openai",
             "config": {
                 "model": "gpt-4o-mini",
                 "temperature": 0.1,
                 "max_tokens": 2000,
-                "api_key": "env:OPENAI_API_KEY"
-            }
-        },
-        "embedder": {
+                "api_key": "env:OPENAI_API_KEY",
+            },
+        }
+        embedder_section = {
             "provider": "openai",
             "config": {
                 "model": "text-embedding-3-small",
-                "api_key": "env:OPENAI_API_KEY"
-            }
+                "api_key": "env:OPENAI_API_KEY",
+            },
+        }
+
+    return {
+        "vector_store": {
+            "provider": vector_store_provider,
+            "config": vector_store_config,
         },
-        "version": "v1.1"
+        "llm": llm_section,
+        "embedder": embedder_section,
+        "version": "v1.1",
     }
 
 

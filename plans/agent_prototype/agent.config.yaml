@@ -8,7 +8,7 @@ profiles:
 capture_interval_sec: 15
 dedupe_ttl_sec: 300
 debug_keep_png: false
-tesseract_path: null
+tesseract_path: 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 mem0_infer: true
 mem0_fallback: false
 

@@ -1,0 +1,25 @@
+# OpenMemory API (.env) — required for the backend/MCP container
+# Copy this file to .env in the same directory and set your real values
+
+# LLM & Embedder API key (OpenAI)
+# The backend accepts either name; set both to be safe
+OPENAI_API_KEY=sk-your-openai-key
+API_KEY=${OPENAI_API_KEY}
+
+# Default user id used by the server when creating/listing memories
+USER=james
+
+# Optional vector-store overrides (defaults to Qdrant in docker-compose)
+# QDRANT_HOST=mem0_store
+# QDRANT_PORT=6333
+
+# Optional: switch to other stores (see app/utils/memory.py for options)
+# CHROMA_HOST=
+# CHROMA_PORT=
+# WEAVIATE_CLUSTER_URL=
+# REDIS_URL=
+# PG_HOST=
+# PG_PORT=
+# PG_DB=
+# PG_USER=
+# PG_PASSWORD=
