@@ -51,6 +51,26 @@ Use this document to track progress across build sessions. Append new entries ch
 
 - [ ] Perform manual validation: run agent once and via loop/hotkeys, confirm memory materializes in OpenMemory UI and is retrievable via MCP `search_memory`.
 
+---
+
+## 2025-09-25 — Docs: Windows agent README
+
+**Participants:** Assistant
+**Duration:** 00:10
+
+### Summary
+
+- Added `plans/agent_prototype/README.md` with Windows setup, configuration, and usage instructions for the capture agent.
+
+### Artifacts touched
+
+- `plans/agent_prototype/README.md` — new documentation.
+- `plans/mem0_screen_ingestion_build_plan.md` — Phase 6 README task checked off.
+
+### Next steps
+
+- [ ] Consider packaging script (PyInstaller) and updating the spec if behavior diverges.
+
 ## 2025-09-25 — Planning Mem0 screen ingestion initiative
 
 **Participants:** GitHub Copilot (assistant), James (implicit requester)

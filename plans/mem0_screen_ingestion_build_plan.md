@@ -51,7 +51,7 @@ This plan accompanies `mem0_screen_ingestion_spec.md` and breaks the effort into
 
 ## Phase 6 – Packaging & docs
 
-- [ ] Create README under `plans/agent_prototype/` with setup instructions for Windows (Tesseract install, env vars).
+- [x] Create README under `plans/agent_prototype/` with setup instructions for Windows (Tesseract install, env vars).
 - [ ] Provide optional packaging script (PyInstaller or `python -m build`) to create executable.
 - [ ] Update `plans/mem0_screen_ingestion_spec.md` references if implementation diverges.
 - [ ] Record summary in work-session log (`mem0_screen_ingestion_log.md`) after each major milestone.
