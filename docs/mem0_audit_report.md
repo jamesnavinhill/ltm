@@ -1,6 +1,6 @@
-## Mem0 OSS Audit and Automated Screen-Ingestion Design (with Gemini)
+# Mem0 OSS Audit and Automated Screen-Ingestion Design (with Gemini)
 
-### Executive summary
+## Executive summary
 
 - Mem0 is a long‑term memory layer for AI agents. It extracts facts from interactions, deduplicates/conflicts them against existing memories, stores them in a vector DB (optionally with a graph store), and retrieves relevant context fast.
 - Ingestion options today: Python/TS SDKs (OSS), a lightweight REST server (`server/`), the hosted Platform client (`mem0.client`), and the OpenMemory project (self‑hosted API + MCP server + UI) that bridges memories to MCP clients.
@@ -11,13 +11,15 @@
 
 ### What the memory system does now
 
-1) Core capabilities
+## 1) Core capabilities
+
 - Fact extraction (LLM‑driven): Given messages, Mem0 prompts an LLM to extract “facts” worth remembering, then prompts again to decide per‑fact whether to ADD/UPDATE/DELETE/NONE.
 - Storage: Facts are embedded and written to a pluggable vector store (Qdrant default; many supported). Each memory payload includes `data` (original text), `hash`, timestamps, and any passed metadata. Optional graph memory builds relationships for richer retrieval.
 - Retrieval: Semantic search (by embedding), plus filtering by `user_id`, `agent_id`, `run_id` to scope memory. Graph search is optional.
 - History: Every mutation logs a row in a local SQLite history DB (OSS) to audit memory evolution.
 
-2) Key modules (Python OSS)
+## 2) Key modules (Python OSS)
+
 - `mem0/memory/main.py` (core)
   - `Memory.add(...)`: validates identifiers, optionally parses multimodal messages, runs the extraction/update prompts, and calls `ADD/UPDATE/DELETE` handlers.
   - `_create_memory/_update_memory/_delete_memory`: writes to vector store and appends to local history.
@@ -33,13 +35,16 @@
   - `parse_vision_messages(...)` routes image messages to `llm.generate_response` for descriptions before fact extraction.
   - Note: current Gemini LLM implementation handles text well; for screenshots prefer OCR → text for reliable ingestion.
 
-3) TypeScript OSS SDK (`mem0-ts`)
+## 3) TypeScript OSS SDK (`mem0-ts`)
+
 - Mirrors core Memory flow: `add/search/get/getAll/update/delete`, provider factories (LLM/Embedder/Vector), and optional graph memory. Useful if you prefer a Node capture service.
 
-4) REST API (OSS server)
+## 4) REST API (OSS server)
+
 - `server/` (FastAPI) exposes endpoints for `configure`, `memories` (add/get/get by id/update/history), and `search`. Good for lightweight, local microservice ingestion without embedding SDK code in your capture app.
 
-5) OpenMemory (self‑hosted API + UI + MCP)
+## 5) OpenMemory (self‑hosted API + UI + MCP)
+
 - `openmemory/` runs a FastAPI backend and Next.js UI, plus an MCP server (`/mcp/.../sse/...`).
 - The MCP server defines tools to `add`, `search`, `list`, and `delete_all`. Each SSE connection sets `user_id` and `client_name`; created memories are recorded both in the vector store and in OpenMemory’s SQL DB and are filtered by “app/client” permissions.
 - This is the most turnkey way to expose your personal memory profiles to MCP clients (Cursor, Claude, Windsurf, etc.).
@@ -113,23 +118,27 @@ mem.add(
 
 Goal: lightweight app that watches screens/monitors, extracts text, dedupes/summarizes if necessary, then feeds Mem0; expose profiles via MCP.
 
-1) Capture strategy
+## Capture strategy
+
 - Trigger: hotkey, clipboard change, window focus change, or periodic sampling (e.g., every N seconds while foreground app is whitelisted).
 - Tools (Windows):
   - Python: `mss` (fast screenshots), `pywin32`/`pygetwindow` for active window titles/handles.
   - Node: `screenshot-desktop`, `robotjs` (or `@nut-tree/nut-js`), `active-win`.
 - Multi‑monitor: tag captures with `monitor_id` and `window_title` in metadata.
 
-2) OCR and normalization
+## 2) OCR and normalization
+
 - OCR: Tesseract (`pytesseract`) locally, or cloud OCR if needed (Azure Computer Vision, Google Cloud Vision). Start with Tesseract for privacy and speed.
 - Normalize: strip timestamps, transient counters, hex hashes, >N repeated lines, and compress whitespace. Keep a rolling cache of recent OCR outputs (per window) and skip if near‑duplicate by:
   - Exact hash (MD5) of normalized text.
   - Cosine similarity of embeddings over 0.95 threshold.
 
-3) Chunking and summarization (optional)
+## 3) Chunking and summarization (optional)
+
 - For large captures, chunk by paragraph or layout region; optionally summarize to a short “fact” list using your Gemini LLM before passing to Mem0. However, Mem0 can perform extraction/dedupe internally (`infer=True`). Prefer feeding raw clean text and let Mem0’s extraction prompts decide.
 
-4) Submission to the memory system
+## 4) Submission to the memory system
+
 - Option A: OpenMemory API (recommended for MCP integration)
   - POST `http://localhost:8765/memories/` with body: `{ user_id, text, metadata, app }` where `app` is your profile name (e.g., `work`, `personal`, `monitor-1`). OpenMemory writes both the vector store and its SQL DB for per‑app scoping.
 - Option B: Mem0 OSS REST server
@@ -137,16 +146,19 @@ Goal: lightweight app that watches screens/monitors, extracts text, dedupes/summ
 - Option C: Direct SDK
   - Call `Memory.add(...)` from your app with appropriate identifiers and metadata.
 
-5) Identifiers and profiles
+## 5) Identifiers and profiles
+
 - Use `user_id="james"` for scoping across devices.
 - Use profiles via OpenMemory MCP path `.../mcp/<client_name>/sse/<user_id>` where `<client_name>` is your profile key (e.g., `work`, `personal`, `monitor-2`).
 - Alternatively use `agent_id`/`run_id` in raw Mem0 to segregate memories by app/task/session.
 
-6) Metadata recommendations
+## 6) Metadata recommendations
+
 - Include `source`, `window_title`, `process_name`, `monitor_id`, `url` (if browser), `selection_bbox`, and your dedupe hashes.
 - These become part of each memory’s payload and are retrievable with search results.
 
-7) Rate limiting and privacy
+## 7) Rate limiting and privacy
+
 - Apply cooldowns per window (e.g., no more than 1 capture/15s unless hotkeyed).
 - Redact obvious PII patterns before submission if desired.
 
@@ -196,18 +208,22 @@ This relies on OpenMemory’s API to write to Mem0 and its SQL DB, enabling MCP 
 
 ### Making outputs available via MCP
 
-1) Run OpenMemory
+## Run OpenMemory
+
 - `make build && make up` in `openmemory/` (or use the provided `run.sh`). Ensure `OPENAI_API_KEY` or your provider keys are set; if you want Gemini for Mem0, update the stored config in the OpenMemory settings UI or DB to `provider: gemini` with `env:GOOGLE_API_KEY`.
 
-2) Connect your client(s)
+## 2) Connect your client(s)
+
 - Install MCP endpoint for a profile:
   - `npx @openmemory/install local http://localhost:8765/mcp/work/sse/james --client work`
   - Repeat for `personal`, `monitor-1`, etc.
 
-3) Use tools in the MCP client
+## 3) Use tools in the MCP client
+
 - Tools exposed: add_memories(text), search_memory(query), list_memories(), delete_all_memories(). They are scoped by the `{client_name}` (your profile) and `{user_id}`.
 
-4) Optionally extend
+## 4) Optionally extend
+
 - If you need agent/run segregation beyond profiles, add `agent_id`/`run_id` to the Mem0 calls in OpenMemory’s MCP server or API router and thread them through as filters.
 
 ---
@@ -249,17 +265,21 @@ This relies on OpenMemory’s API to write to Mem0 and its SQL DB, enabling MCP 
 
 ### Minimal test plan
 
-1) Local run
+## 1) Local run
+
 - Start OpenMemory and Qdrant. Confirm `http://localhost:8765/docs` and UI on `:3000`.
 - Configure Mem0 in OpenMemory for Gemini or your chosen provider.
 
-2) OCR feeder
+## 2) OCR feeder
+
 - Run the Python feeder; trigger a few captures with distinct text; verify OpenMemory UI shows memories for the `work` app.
 
-3) MCP
+## 3) MCP
+
 - Install MCP endpoint for `work` and query via your editor/assistant: use `search_memory("meeting")` → ensure expected results.
 
-4) Profiles
+## 4) Profiles
+
 - Add `personal` endpoint; ingest different content; verify separation between profiles in list/search tools.
 
 ---
@@ -275,7 +295,3 @@ This relies on OpenMemory’s API to write to Mem0 and its SQL DB, enabling MCP 
 - TypeScript SDK core: `mem0-ts/src/oss/src/memory/index.ts`
 
 ---
-
-If you want, I can scaffold the Windows capture service and the OpenMemory config for Gemini in this repo and wire a basic UI toggle for profiles.
-
-
