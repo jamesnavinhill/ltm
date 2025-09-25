@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from .capture import drain_queue, run_once_and_submit
+from .capture import drain_queue, run_once_and_submit, loop_foreground_changes, run_hotkey_listener
 
 
 def main(argv=None):
@@ -18,6 +18,12 @@ def main(argv=None):
     drain.add_argument("--config", required=False, help="Path to YAML/TOML config")
     drain.add_argument("--batch", type=int, default=25, help="Batch size per run")
 
+    loop = sub.add_parser("loop", help="Run capture loop on foreground window changes")
+    loop.add_argument("--config", required=False, help="Path to YAML/TOML config")
+
+    hotkey = sub.add_parser("hotkeys", help="Run global hotkey listener for configured profiles")
+    hotkey.add_argument("--config", required=False, help="Path to YAML/TOML config")
+
     args = parser.parse_args(argv)
     if args.cmd == "once":
         res = run_once_and_submit(config_path=args.config, profile=args.profile)
@@ -26,6 +32,12 @@ def main(argv=None):
     elif args.cmd == "drain":
         res = drain_queue(config_path=args.config, batch_size=args.batch)
         print(res)
+        return 0
+    elif args.cmd == "loop":
+        loop_foreground_changes(config_path=args.config)
+        return 0
+    elif args.cmd == "hotkeys":
+        run_hotkey_listener(config_path=args.config)
         return 0
     else:
         parser.print_help()

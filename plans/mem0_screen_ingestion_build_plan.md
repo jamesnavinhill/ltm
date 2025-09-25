@@ -37,10 +37,10 @@ This plan accompanies `mem0_screen_ingestion_spec.md` and breaks the effort into
 
 ## Phase 4 – Multi-profile routing & controls
 
-- [ ] Extend config to map hotkeys/window filters to `app` profile names (align with spec §6.5).
-- [ ] Implement global hotkey listener (e.g., `keyboard` lib) to trigger immediate capture to selected profile.
-- [ ] Add foreground window change detection (via `pywin32` events or polling) to reduce redundant captures.
-- [ ] Log accepted/skipped captures with metadata for debugging (write to rotating file or stdout).
+- [x] Extend config to map hotkeys/window filters to `app` profile names (align with spec §6.5).
+- [x] Implement global hotkey listener (e.g., `keyboard` lib) to trigger immediate capture to selected profile.
+- [x] Add foreground window change detection (via `pywin32` events or polling) to reduce redundant captures.
+- [x] Log accepted/skipped captures with metadata for debugging (write to rotating file or stdout).
 
 ## Phase 5 – Testing & validation
 

@@ -12,4 +12,9 @@ tesseract_path: null
 mem0_infer: true
 mem0_fallback: false
 
+# Phase 4 logging and loop controls
+log_path: null  # e.g., "agent.log" to write to file; null for stdout
+log_level: "INFO"
+foreground_change_only: true
+
 

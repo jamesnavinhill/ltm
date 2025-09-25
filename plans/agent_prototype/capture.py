@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-import json
 import os
 import tempfile
 from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
-import requests
 import httpx
+import time
+import logging
+import threading
 
 try:
     import pytesseract
@@ -33,6 +34,28 @@ except Exception:  # pragma: no cover
 from .config import AgentConfig, ProfileRoute, load_agent_config
 from .dedupe import TtlLruCache, compute_text_hash, normalize_text
 from .queue import PayloadQueue
+
+
+_LOGGER = logging.getLogger("agent.capture")
+
+
+def configure_logging(cfg: AgentConfig) -> None:
+    if _LOGGER.handlers:
+        return
+    level = getattr(logging, (getattr(cfg, "log_level", "INFO") or "INFO").upper(), logging.INFO)
+    _LOGGER.setLevel(level)
+    formatter = logging.Formatter(
+        fmt="%(asctime)s %(levelname)s %(name)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    handler: logging.Handler
+    log_path = getattr(cfg, "log_path", None)
+    if log_path:
+        handler = logging.FileHandler(log_path, encoding="utf-8")
+    else:
+        handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    _LOGGER.addHandler(handler)
 
 
 def _get_active_window_info() -> Tuple[Optional[str], Optional[str]]:
@@ -77,6 +100,7 @@ def capture_once(config: Optional[AgentConfig] = None, profile: Optional[str] = 
 
     title, proc = _get_active_window_info()
     if not _allowed_by_profile(title, proc, chosen_profile):
+        _LOGGER.debug("capture skipped: profile filters rejected window")
         return None
 
     with mss.mss() as sct:
@@ -97,10 +121,12 @@ def capture_once(config: Optional[AgentConfig] = None, profile: Optional[str] = 
 
     normalized = normalize_text(raw_text)
     if not normalized:
+        _LOGGER.debug("capture skipped: OCR produced empty text")
         return None
 
     ocr_hash = compute_text_hash(normalized)
     if dedupe and dedupe.seen(ocr_hash):
+        _LOGGER.debug("capture skipped: dedupe hash seen recently")
         return None
     if dedupe:
         dedupe.add(ocr_hash)
@@ -118,6 +144,13 @@ def capture_once(config: Optional[AgentConfig] = None, profile: Optional[str] = 
         "infer": cfg.mem0_infer,
         "text": normalized,
     }
+    _LOGGER.info(
+        "capture accepted: app=%s title=%s process=%s hash=%s",
+        chosen_profile.app,
+        (title or "")[:120],
+        proc or "",
+        ocr_hash[:8],
+    )
     return payload
 
 
@@ -152,6 +185,7 @@ def submit_to_openmemory(payload: Dict, cfg: Optional[AgentConfig] = None) -> Di
 
 def run_once_and_submit(config_path: Optional[str] = None, profile: Optional[str] = None) -> Dict[str, Optional[str]]:
     cfg = load_agent_config(config_path)
+    configure_logging(cfg)
     result: Dict[str, Optional[str]] = {"status": None, "error": None}
     try:
         memory_payload = capture_once(cfg, profile=profile, dedupe=TtlLruCache(ttl_seconds=cfg.dedupe_ttl_sec))
@@ -171,6 +205,105 @@ def run_once_and_submit(config_path: Optional[str] = None, profile: Optional[str
         result["status"] = "error"
         result["error"] = str(e)
     return result
+
+
+def _active_window_signature() -> Optional[str]:
+    title, proc = _get_active_window_info()
+    if title is None and proc is None:
+        return None
+    return f"{title}|{proc}"
+
+
+def loop_foreground_changes(config_path: Optional[str] = None) -> None:
+    """Capture loop that runs when the foreground window changes.
+
+    Polls every `capture_interval_sec`. Uses dedupe cache and profile filters.
+    """
+    cfg = load_agent_config(config_path)
+    configure_logging(cfg)
+    dedupe = TtlLruCache(ttl_seconds=cfg.dedupe_ttl_sec)
+    last_sig: Optional[str] = None
+    _LOGGER.info(
+        "loop started: foreground_change_only=%s interval=%ss",
+        getattr(cfg, "foreground_change_only", True),
+        cfg.capture_interval_sec,
+    )
+    try:
+        while True:
+            sig = _active_window_signature()
+            if sig is None:
+                time.sleep(cfg.capture_interval_sec)
+                continue
+            if not getattr(cfg, "foreground_change_only", True) or sig != last_sig:
+                last_sig = sig
+                title, proc = _get_active_window_info()
+                chosen: Optional[ProfileRoute] = None
+                for p in cfg.profiles:
+                    if _allowed_by_profile(title, proc, p):
+                        chosen = p
+                        break
+                if chosen is None:
+                    _LOGGER.debug("loop skipped: no matching profile for active window")
+                else:
+                    payload = capture_once(cfg, profile=chosen.app, dedupe=dedupe)
+                    if payload:
+                        try:
+                            submit_to_openmemory(payload, cfg)
+                        except SubmitError as e:
+                            queue = PayloadQueue()
+                            queue.enqueue(payload)
+                            _LOGGER.warning("submit queued: %s", str(e))
+            time.sleep(cfg.capture_interval_sec)
+    except KeyboardInterrupt:
+        _LOGGER.info("loop interrupted by user")
+
+
+def run_hotkey_listener(config_path: Optional[str] = None) -> None:
+    """Register global hotkeys from config to trigger immediate capture per profile."""
+    cfg = load_agent_config(config_path)
+    configure_logging(cfg)
+    try:
+        import keyboard  # type: ignore
+    except Exception as e:  # pragma: no cover
+        _LOGGER.error("keyboard library not installed. Install with: pip install keyboard (%s)", e)
+        raise
+
+    dedupe = TtlLruCache(ttl_seconds=cfg.dedupe_ttl_sec)
+    capture_lock = threading.Lock()
+
+    def trigger_capture_for_profile(profile_app: str) -> None:
+        with capture_lock:
+            payload = capture_once(cfg, profile=profile_app, dedupe=dedupe)
+            if payload:
+                try:
+                    submit_to_openmemory(payload, cfg)
+                    _LOGGER.info("hotkey capture submitted: app=%s", profile_app)
+                except SubmitError as e:
+                    queue = PayloadQueue()
+                    queue.enqueue(payload)
+                    _LOGGER.warning("hotkey submit queued: %s", str(e))
+            else:
+                _LOGGER.debug("hotkey capture skipped by filters/dedupe/empty text")
+
+    registered = 0
+    for p in cfg.profiles:
+        if p.hotkey:
+            try:
+                keyboard.add_hotkey(p.hotkey, lambda app=p.app: trigger_capture_for_profile(app))
+                _LOGGER.info("registered hotkey '%s' for app=%s", p.hotkey, p.app)
+                registered += 1
+            except Exception as e:
+                _LOGGER.error("failed to register hotkey '%s': %s", p.hotkey, e)
+
+    if registered == 0:
+        _LOGGER.warning("no hotkeys configured; nothing to listen for")
+        return
+
+    _LOGGER.info("hotkey listener running. Press Ctrl+C to stop.")
+    try:
+        keyboard.wait()
+    except KeyboardInterrupt:
+        _LOGGER.info("hotkey listener interrupted by user")
 
 
 def drain_queue(config_path: Optional[str] = None, batch_size: int = 25) -> Dict[str, int]:

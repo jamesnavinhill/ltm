@@ -14,6 +14,7 @@ __all__ = [
     "config",
     "capture",
     "dedupe",
+    "queue",
 ]
 
 

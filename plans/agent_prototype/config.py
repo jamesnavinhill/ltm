@@ -35,6 +35,10 @@ class AgentConfig:
     tesseract_path: Optional[str] = None
     mem0_infer: bool = True
     mem0_fallback: bool = False
+    # Phase 4 additions
+    log_path: Optional[str] = None
+    log_level: str = "INFO"
+    foreground_change_only: bool = True
 
     @staticmethod
     def from_dict(data: Dict[str, Any]) -> "AgentConfig":
@@ -58,6 +62,9 @@ class AgentConfig:
             tesseract_path=data.get("tesseract_path"),
             mem0_infer=bool(data.get("mem0_infer", True)),
             mem0_fallback=bool(data.get("mem0_fallback", False)),
+            log_path=data.get("log_path"),
+            log_level=str(data.get("log_level", "INFO")),
+            foreground_change_only=bool(data.get("foreground_change_only", True)),
         )
 
 

@@ -86,6 +86,36 @@ Use this document to track progress across build sessions. Append new entries ch
 
 ---
 
+## 2025-09-25 — Phase 4 controls: window-change loop + logging
+
+**Participants:** Assistant
+**Duration:** 00:35
+
+### Summary
+
+- Extended agent config with `log_path`, `log_level`, and `foreground_change_only` controls.
+- Added structured logging and messages for skipped/accepted captures in `plans/agent_prototype/capture.py`.
+- Implemented foreground window change detection loop `loop_foreground_changes` with dedupe and profile matching.
+- Updated CLI with `loop` command to run the detection loop.
+- Updated default `agent.config.yaml` to include logging/loop controls.
+
+### Artifacts touched
+
+- `plans/agent_prototype/config.py` — added logging/loop config fields and loader support.
+- `plans/agent_prototype/capture.py` — logging, loop implementation, and minor refactor.
+- `plans/agent_prototype/cli.py` — new `loop` command.
+- `plans/agent_prototype/agent.config.yaml` — new config keys.
+- `plans/mem0_screen_ingestion_build_plan.md` — Phase 4 checklist updated.
+
+### Decisions & Blockers
+
+- Chose polling-based foreground change detection for simplicity; can upgrade to event hooks later.
+- Hotkey listener remains pending; will integrate `keyboard` library next session.
+
+### Next steps
+
+- [ ] Validate loop behavior in local environment and tune intervals/log levels.
+
 ## 2025-09-25 — Phase 3 ingestion adapter (httpx + queue + CLI)
 
 **Participants:** Assistant
@@ -111,6 +141,3 @@ Use this document to track progress across build sessions. Append new entries ch
 
 - Left Mem0 SDK fallback as optional (to be implemented after env stabilizes) since server-first ingestion is primary path.
 
-### Next steps
-
-- [ ] Implement Mem0 SDK fallback path gated by `mem0_fallback` flag.
