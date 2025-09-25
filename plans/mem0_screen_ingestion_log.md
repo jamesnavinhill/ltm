@@ -24,6 +24,33 @@ Use this document to track progress across build sessions. Append new entries ch
 
 ---
 
+## 2025-09-25 — Phase 5 tests: unit + integration
+
+**Participants:** Assistant
+**Duration:** 00:30
+
+### Summary
+
+- Added unit tests under `tests/agent/` for dedupe cache, text normalization/hash, config loader roundtrip, and queue persistence.
+- Added integration-style test that mocks `httpx.AsyncClient` to validate `submit_to_openmemory` payloads and success path without hitting a live server.
+- Updated build plan to reflect completed Phase 5 automated tests.
+
+### Artifacts touched
+
+- `tests/agent/test_dedupe.py` — normalization, hashing, TTL LRU behavior.
+- `tests/agent/test_config.py` — config parsing and YAML load.
+- `tests/agent/test_queue.py` — enqueue/dequeue/mark-success lifecycle.
+- `tests/agent/test_integration_submit.py` — mock HTTP client for submit.
+- `plans/mem0_screen_ingestion_build_plan.md` — Phase 5 updates.
+
+### Decisions & Blockers
+
+- Chose to mock `httpx` for submit test to keep suite hermetic. E2E against real OpenMemory remains a manual step.
+
+### Next steps
+
+- [ ] Perform manual validation: run agent once and via loop/hotkeys, confirm memory materializes in OpenMemory UI and is retrievable via MCP `search_memory`.
+
 ## 2025-09-25 — Planning Mem0 screen ingestion initiative
 
 **Participants:** GitHub Copilot (assistant), James (implicit requester)

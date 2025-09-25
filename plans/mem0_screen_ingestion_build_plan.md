@@ -44,8 +44,8 @@ This plan accompanies `mem0_screen_ingestion_spec.md` and breaks the effort into
 
 ## Phase 5 – Testing & validation
 
-- [ ] Unit tests for dedupe cache, config loader, queue persistence (locate in `tests/agent/` or similar, using `pytest`).
-- [ ] Integration test against mocked OpenMemory FastAPI endpoint verifying payload structure.
+- [x] Unit tests for dedupe cache, config loader, queue persistence (locate in `tests/agent/` or similar, using `pytest`).
+- [x] Integration test against mocked OpenMemory FastAPI endpoint verifying payload structure.
 - [ ] Manual test: run agent, capture real window, confirm memory appears in OpenMemory UI and `Memory` SQL table.
 - [ ] Manual test: connect MCP client (`npx @openmemory/install ...`) and verify `search_memory` returns new fact.
 
