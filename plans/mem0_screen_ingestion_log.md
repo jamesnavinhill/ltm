@@ -60,11 +60,13 @@ Use this document to track progress across build sessions. Append new entries ch
 **Duration:** 00:40
 
 ### Summary
+
 - Created `plans/agent_prototype/` with `config.py`, `capture.py`, `dedupe.py`, and defaults file `agent.config.yaml`.
 - Implemented YAML/TOML config loading, Windows active window metadata capture, OCR via `pytesseract`, normalization, and MD5 dedupe cache.
 - Added `run_once_and_submit` helper that captures once and POSTs to OpenMemory `POST /api/v1/memories/`.
 
 ### Artifacts touched
+
 - `plans/agent_prototype/__init__.py` — package init.
 - `plans/agent_prototype/config.py` — config dataclasses and loader.
 - `plans/agent_prototype/capture.py` — capture+OCR+submit logic.
@@ -73,10 +75,12 @@ Use this document to track progress across build sessions. Append new entries ch
 - `plans/mem0_screen_ingestion_build_plan.md` — checked off Phase 1/2 items; added Phase 3 submit helper.
 
 ### Decisions & Blockers
+
 - Blocked on Docker/make not present on host; paused Phase 0 container setup and proceeded with agent coding.
 - Will swap `requests` for `httpx` and add queue fallback in Phase 3 once API is reachable locally.
 
 ### Next steps
+
 - [ ] Start OpenMemory containers and confirm Qdrant/POST path.
 - [ ] Implement SQLite-backed retry queue and `--drain` CLI.
 
@@ -88,12 +92,14 @@ Use this document to track progress across build sessions. Append new entries ch
 **Duration:** 00:35
 
 ### Summary
+
 - Switched submit helper to `httpx` with async client and robust error handling.
 - Added SQLite-backed retry queue (`plans/agent_prototype/queue.py`) for failed submissions.
 - Added CLI (`plans/agent_prototype/cli.py`) with `once` and `drain` commands.
 - Extended config to include `mem0_fallback` flag (reserved for optional SDK fallback).
 
 ### Artifacts touched
+
 - `plans/agent_prototype/capture.py` — httpx submit, queue integration, `drain_queue`.
 - `plans/agent_prototype/queue.py` — new queue implementation.
 - `plans/agent_prototype/config.py` — `mem0_fallback` option.
@@ -102,7 +108,9 @@ Use this document to track progress across build sessions. Append new entries ch
 - `plans/mem0_screen_ingestion_build_plan.md` — Phase 3 updated and checked items.
 
 ### Decisions & Blockers
+
 - Left Mem0 SDK fallback as optional (to be implemented after env stabilizes) since server-first ingestion is primary path.
 
 ### Next steps
+
 - [ ] Implement Mem0 SDK fallback path gated by `mem0_fallback` flag.

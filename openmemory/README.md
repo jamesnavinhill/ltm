@@ -7,6 +7,7 @@ OpenMemory is your personal memory layer for LLMs - private, portable, and open-
 ## Easy Setup
 
 ### Prerequisites
+
 - Docker
 - OpenAI API Key
 
@@ -56,18 +57,20 @@ You can do this in one of the following ways:
   cp ui/.env.example ui/.env
   ```
 
- - **Using Makefile** (if supported):  
+- **Using Makefile** (if supported):  
     Run:
   
    ```bash
    make env
    ```
+
 - #### Example `/api/.env`
 
 ```env
 OPENAI_API_KEY=sk-xxx
 USER=<user-id> # The User Id you want to associate the memories with 
 ```
+
 - #### Example `/ui/.env`
 
 ```env
@@ -76,15 +79,18 @@ NEXT_PUBLIC_USER_ID=<user-id> # Same as the user id for environment variable in 
 ```
 
 ### 2. Build and Run the Project
+
 You can run the project using the following two commands:
+
 ```bash
 make build # builds the mcp server and ui
 make up  # runs openmemory mcp server and ui
 ```
 
 After running these commands, you will have:
-- OpenMemory MCP server running at: http://localhost:8765 (API documentation available at http://localhost:8765/docs)
-- OpenMemory UI running at: http://localhost:3000
+
+- OpenMemory MCP server running at: <http://localhost:8765> (API documentation available at <http://localhost:8765/docs>)
+- OpenMemory UI running at: <http://localhost:3000>
 
 #### UI not working on `localhost:3000`?
 
@@ -106,7 +112,6 @@ npx @openmemory/install local http://localhost:8765/mcp/<client-name>/sse/<user-
 
 Replace `<client-name>` with the desired client name and `<user-id>` with the value specified in your environment variables.
 
-
 ## Project Structure
 
 - `api/` - Backend APIs + MCP server
@@ -117,6 +122,7 @@ Replace `<client-name>` with the desired client name and `<user-id>` with the va
 We are a team of developers passionate about the future of AI and open-source software. With years of experience in both fields, we believe in the power of community-driven development and are excited to build tools that make AI more accessible and personalized.
 
 We welcome all forms of contributions:
+
 - Bug reports and feature requests
 - Documentation improvements
 - Code contributions
