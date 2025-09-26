@@ -27,12 +27,13 @@ The LOCOMO dataset used in our experiments can be downloaded from our Google Dri
 The dataset contains conversational data specifically designed to test memory recall and understanding across various question types and complexity levels.
 
 Place the dataset files in the `dataset/` directory:
+
 - `locomo10.json`: Original dataset
 - `locomo10_rag.json`: Dataset formatted for RAG experiments
 
 ## 📁 Project Structure
 
-```
+```,
 .
 ├── src/                  # Source code for different memory techniques
 │   ├── mem0/             # Implementation of the Mem0 technique
@@ -55,7 +56,7 @@ Place the dataset files in the `dataset/` directory:
 
 Create a `.env` file with your API keys and configurations. The following keys are required:
 
-```
+```,
 # OpenAI API key for GPT models and embeddings
 OPENAI_API_KEY="your-openai-api-key"
 
@@ -106,7 +107,7 @@ Alternatively, you can run experiments directly with custom parameters:
 python run_experiments.py --technique_type [mem0|rag|langmem] [additional parameters]
 ```
 
-#### Command-line Parameters:
+#### Command-line Parameters
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
@@ -127,6 +128,7 @@ python evals.py --input_file [path_to_results] --output_file [output_path]
 ```
 
 This script:
+
 1. Processes each question-answer pair
 2. Calculates BLEU and F1 scores automatically
 3. Uses an LLM judge to evaluate answer correctness
@@ -141,13 +143,15 @@ python generate_scores.py
 ```
 
 This script:
+
 1. Loads the evaluation metrics data
 2. Calculates mean scores for each category (BLEU, F1, LLM)
 3. Reports the number of questions per category
 4. Calculates overall mean scores across all categories
 
 Example output:
-```
+
+```,
 Mean Scores Per Category:
          bleu_score  f1_score  llm_score  count
 category                                       
@@ -195,4 +199,3 @@ If you use this code or dataset in your research, please cite our paper:
 - [Saket Aryan](https://github.com/whysosaket)
 - [Taranjeet Singh](https://github.com/taranjeet)
 - [Deshraj Yadav](https://github.com/deshraj)
-

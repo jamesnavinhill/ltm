@@ -1,0 +1,103 @@
+
+> mem0ai@2.1.38 test C:\Users\james\Desktop\projects\ltm\mem0-ts
+> jest
+
+ts-jest[ts-jest-transformer] (WARN) Define `ts-jest` config under `globals` is deprecated. Please do
+transform: {
+    <transform_regex>: ['ts-jest', { /* ts-jest config goes here in Jest */ }],
+},
+See more at https://kulshekhar.github.io/ts-jest/docs/getting-started/presets#advanced
+ts-jest[ts-jest-transformer] (WARN) Define `ts-jest` config under `globals` is deprecated. Please do
+transform: {
+    <transform_regex>: ['ts-jest', { /* ts-jest config goes here in Jest */ }],
+},
+See more at https://kulshekhar.github.io/ts-jest/docs/getting-started/presets#advanced
+FAIL src/oss/tests/memory.test.ts
+  ΓùÅ Test suite failed to run
+
+    src/oss/tests/memory.test.ts:56:9 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    56         userId,
+               ~~~~~~
+    src/oss/tests/memory.test.ts:72:50 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    72       const result = (await memory.add(messages, userId)) as SearchResult;
+                                                        ~~~~~~
+    src/oss/tests/memory.test.ts:84:9 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    84         userId,
+               ~~~~~~
+    src/oss/tests/memory.test.ts:104:9 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    104         userId,
+                ~~~~~~
+    src/oss/tests/memory.test.ts:125:69 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    125       await memory.add("I love visiting new places in the winters", userId);
+                                                                            ~~~~~~
+    src/oss/tests/memory.test.ts:126:52 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    126       await memory.add("I like to rule the world", userId);
+                                                           ~~~~~~
+    src/oss/tests/memory.test.ts:128:43 - error TS2559: Type 'string' has no properties in common with type 'GetAllMemoryOptions'.
+
+    128       const result = (await memory.getAll(userId)) as SearchResult;
+                                                  ~~~~~~
+    src/oss/tests/memory.test.ts:137:56 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    137       await memory.add("I love programming in Python", userId);
+                                                               ~~~~~~
+    src/oss/tests/memory.test.ts:138:62 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    138       await memory.add("JavaScript is my favorite language", userId);
+                                                                     ~~~~~~
+    src/oss/tests/memory.test.ts:142:9 - error TS2559: Type 'string' has no properties in common with type 'SearchMemoryOptions'.
+
+    142         userId,
+                ~~~~~~
+    src/oss/tests/memory.test.ts:154:9 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    154         userId,
+                ~~~~~~
+    src/oss/tests/memory.test.ts:175:9 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    175         userId,
+                ~~~~~~
+    src/oss/tests/memory.test.ts:231:9 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    231         userId,
+                ~~~~~~
+    src/oss/tests/memory.test.ts:242:70 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    242       await customMemory.add("The weather in London is rainy today", userId);
+                                                                             ~~~~~~
+    src/oss/tests/memory.test.ts:243:72 - error TS2559: Type 'string' has no properties in common with type 'AddMemoryOptions'.
+
+    243       await customMemory.add("The temperature in Paris is 25 degrees", userId);
+                                                                               ~~~~~~
+    src/oss/tests/memory.test.ts:247:9 - error TS2559: Type 'string' has no properties in common with type 'SearchMemoryOptions'.
+
+    247         userId,
+                ~~~~~~
+
+FAIL src/client/tests/memoryClient.test.ts
+  ΓùÅ Test suite failed to run
+
+    src/client/tests/memoryClient.test.ts:32:34 - error TS2345: Argument of type '{ role: string; content: string; }[]' is not assignable to parameter of type 'Message[]'.
+      Type '{ role: string; content: string; }' is not assignable to type 'Message'.
+        Types of property 'role' are incompatible.
+          Type 'string' is not assignable to type '"user" | "assistant"'.
+
+    32     const res = await client.add(messages1, { user_id: userId || "" });
+                                        ~~~~~~~~~
+    src/client/tests/memoryClient.test.ts:385:51 - error TS2345: Argument of type 'string' is not assignable to parameter of type '{ entity_id: number; entity_type: string; }'.
+
+    385       const deletedUser = await client.deleteUser(entity.id);
+                                                          ~~~~~~~~~
+
+Test Suites: 2 failed, 2 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        12.276 s
+Ran all test suites.
+ΓÇëELIFECYCLEΓÇë Test failed. See above for more details.

@@ -10,9 +10,9 @@ This plan accompanies `mem0_screen_ingestion_spec.md` and breaks the effort into
 
 ## Phase 0 – Environment readiness
 
-- [ ] Confirm OpenMemory stack is running locally (`openmemory/Makefile`: `make up`) with Qdrant reachable.
-- [ ] Update OpenMemory memory configuration for Gemini provider if required (`openmemory/ui` settings ➝ persists to database via `get_memory_client`).
-- [ ] Verify `POST /api/v1/memories/` accepts sample payload using `plans/mem0_screen_ingestion_spec.md` metadata schema (references `openmemory/api/app/routers/memories.py`).
+- [~] Confirm OpenMemory stack is running locally (Docker compose used; API/UI reachable). Qdrant running.
+- [x] Update OpenMemory memory configuration for Gemini-first provider selection by env (`GOOGLE_API_KEY` → Gemini, else OpenAI).
+- [ ] Verify `POST /api/v1/memories/` accepts sample payload using `plans/mem0_screen_ingestion_spec.md` metadata schema (requires valid API key in `openmemory/api/.env`).
 
 ## Phase 1 – Capture agent scaffolding (Python)
 

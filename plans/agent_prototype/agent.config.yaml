@@ -3,10 +3,10 @@ user_id: "james"
 profiles:
   - hotkey: "ctrl+alt+w"
     app: "work"
-    whitelist_titles: ["Code", "Chrome", "Terminal"]
-    whitelist_processes: ["Code.exe", "chrome.exe", "pwsh.exe"]
+    whitelist_titles: []
+    whitelist_processes: []
 capture_interval_sec: 15
-dedupe_ttl_sec: 300
+dedupe_ttl_sec: 10
 debug_keep_png: false
 tesseract_path: 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 mem0_infer: true

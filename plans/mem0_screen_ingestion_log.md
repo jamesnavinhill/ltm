@@ -71,6 +71,29 @@ Use this document to track progress across build sessions. Append new entries ch
 
 - [ ] Consider packaging script (PyInstaller) and updating the spec if behavior diverges.
 
+---
+
+## 2025-09-25 — Env examples + Gemini-first selection
+
+**Participants:** Assistant
+**Duration:** 00:15
+
+### Summary
+
+- Added example env templates: `openmemory/api/ENV_EXAMPLE.txt` and `openmemory/ENV_EXAMPLE.txt`.
+- Implemented Gemini-first selection in `openmemory/api/app/utils/memory.py`: use `GOOGLE_API_KEY` when present, fallback to `OPENAI_API_KEY`.
+
+### Artifacts touched
+
+- `openmemory/api/ENV_EXAMPLE.txt` — API env template.
+- `openmemory/ENV_EXAMPLE.txt` — root/UI env template.
+- `openmemory/api/app/utils/memory.py` — provider selection logic.
+- `plans/mem0_screen_ingestion_spec.md` — environment section updated.
+
+### Next steps
+
+- [ ] Fill `openmemory/api/.env` with keys, restart stack, then perform end-to-end manual validation and MCP check.
+
 ## 2025-09-25 — Planning Mem0 screen ingestion initiative
 
 **Participants:** GitHub Copilot (assistant), James (implicit requester)
@@ -187,4 +210,3 @@ Use this document to track progress across build sessions. Append new entries ch
 ### Decisions & Blockers
 
 - Left Mem0 SDK fallback as optional (to be implemented after env stabilizes) since server-first ingestion is primary path.
-

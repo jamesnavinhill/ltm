@@ -119,6 +119,10 @@
 - Capture agent runs on Windows (system tray app eventually; MVP CLI script).
 - For packaging, consider PyInstaller once script stable; not required for prototype.
 
+Gemini-first configuration:
+- The server selects Gemini when `GOOGLE_API_KEY` is present in `openmemory/api/.env`; otherwise it falls back to OpenAI (`OPENAI_API_KEY`).
+- UI env lives in `openmemory/.env` (`NEXT_PUBLIC_API_URL`, `USER`).
+
 ## 7. External integration details
 
 ### 7.1 OpenMemory REST contract
