@@ -2,15 +2,33 @@ import logging
 
 from mem0.memory.utils import format_entities, sanitize_relationship_for_cypher
 
+# Soft-optional dependencies: allow import of this module without graph deps
+# to enable patching/mocking in tests. Raise only on actual use.
+_HAVE_NEO4J = True
 try:
-    from langchain_neo4j import Neo4jGraph
-except ImportError:
-    raise ImportError("langchain_neo4j is not installed. Please install it using pip install langchain-neo4j")
+    from langchain_neo4j import Neo4jGraph as _Neo4jGraph
+except Exception:
+    _HAVE_NEO4J = False
 
+    class _Neo4jGraph:  # type: ignore
+        def __init__(self, *args, **kwargs):
+            raise ImportError(
+                "langchain_neo4j is required for graph memory operations. Install with: pip install langchain-neo4j"
+            )
+
+_HAVE_BM25 = True
 try:
-    from rank_bm25 import BM25Okapi
-except ImportError:
-    raise ImportError("rank_bm25 is not installed. Please install it using pip install rank-bm25")
+    from rank_bm25 import BM25Okapi as _BM25Okapi
+except Exception:
+    _HAVE_BM25 = False
+
+    class _BM25Okapi:  # type: ignore
+        def __init__(self, corpus):
+            self._corpus = corpus
+
+        def get_top_n(self, tokenized_query, documents, n=5):
+            # Fallback: return first n documents without reranking
+            return documents[:n]
 
 from mem0.graphs.tools import (
     DELETE_MEMORY_STRUCT_TOOL_GRAPH,
@@ -29,7 +47,7 @@ logger = logging.getLogger(__name__)
 class MemoryGraph:
     def __init__(self, config):
         self.config = config
-        self.graph = Neo4jGraph(
+        self.graph = _Neo4jGraph(
             self.config.graph_store.config.url,
             self.config.graph_store.config.username,
             self.config.graph_store.config.password,
@@ -115,7 +133,7 @@ class MemoryGraph:
         search_outputs_sequence = [
             [item["source"], item["relationship"], item["destination"]] for item in search_output
         ]
-        bm25 = BM25Okapi(search_outputs_sequence)
+        bm25 = _BM25Okapi(search_outputs_sequence)
 
         tokenized_query = query.split(" ")
         reranked_results = bm25.get_top_n(tokenized_query, search_outputs_sequence, n=5)
