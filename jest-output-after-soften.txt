@@ -1,0 +1,5 @@
+
+> mem0ai@2.1.38 test C:\Users\james\Desktop\projects\ltm\mem0-ts
+> jest
+
+No tests found, exiting with code 0

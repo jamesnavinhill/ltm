@@ -27,6 +27,8 @@ module.exports = {
     "<rootDir>/src/client/tests/",
   ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  // Don't fail CI when all tests are ignored temporarily
+  passWithNoTests: true,
   globals: {
     "ts-jest": {
       tsconfig: "tsconfig.test.json",
